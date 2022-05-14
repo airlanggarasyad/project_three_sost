@@ -19,33 +19,32 @@ uint read32(void *src)
 
 void main(void)
 {
+	int niu[5] = {4, 8, 7, 5, 8};
+
 	uint gpfsel2 = read32(BCM2837_GPFSEL2);
 	gpfsel2 |= (1<<3); //turn pin 21 into an output.
 	write32(BCM2837_GPFSEL2, gpfsel2);
 
 	int i = 0;
 
-	while(1)
+	for(int i=0; i<5; i++)
 	{
-		//turn on pin 21
-		write32(BCM2837_GPSET0, 1<<21);
-
-		//delay
-		i = 0;
-		while (i < 0x800000)
+		for(int j=0; j<niu[i]; j++)
 		{
-			i++;
+			//turn on pin 21
+			write32(BCM2837_GPSET0, 1<<21);
+
+			//delay
+			delay(200);
+
+			//turn off pin 21
+			write32(BCM2837_GPCLR0, 1<<21);
+
+			//delay
+			int k = 0;
+			delay(200);
 		}
 
-		//turn off pin 21
-		write32(BCM2837_GPCLR0, 1<<21);
-
-		//delay
-		i = 0;
-		while (i < 0x800000)
-		{
-			i++;
-		}
-
+		delay(2000);
 	}
 }
