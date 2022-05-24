@@ -1,0 +1,100 @@
+
+build/output.elf:     file format elf32-littlearm
+
+
+Disassembly of section .init:
+
+00008000 <_start>:
+    8000:	e3a0d902 	mov	sp, #32768	; 0x8000
+    8004:	ea000012 	b	8054 <_main>
+
+Disassembly of section .text:
+
+00008008 <mailbox_write>:
+    8008:	e59f1040 	ldr	r1, [pc, #64]	; 8050 <right_mail$+0x24>
+
+0000800c <wait$>:
+    800c:	e5912038 	ldr	r2, [r1, #56]	; 0x38
+    8010:	e3120102 	tst	r2, #-2147483648	; 0x80000000
+    8014:	1afffffc 	bne	800c <wait$>
+    8018:	e5810020 	str	r0, [r1, #32]
+    801c:	e1a0f00e 	mov	pc, lr
+
+00008020 <mailbox_read>:
+    8020:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
+    8024:	e1a01000 	mov	r1, r0
+    8028:	e59f0020 	ldr	r0, [pc, #32]	; 8050 <right_mail$+0x24>
+
+0000802c <right_mail$>:
+    802c:	e5902018 	ldr	r2, [r0, #24]
+    8030:	e3120101 	tst	r2, #1073741824	; 0x40000000
+    8034:	1afffffc 	bne	802c <right_mail$>
+    8038:	e5902000 	ldr	r2, [r0]
+    803c:	e202300f 	and	r3, r2, #15
+    8040:	e1330001 	teq	r3, r1
+    8044:	1afffff8 	bne	802c <right_mail$>
+    8048:	e3c2000f 	bic	r0, r2, #15
+    804c:	e49df004 	pop	{pc}		; (ldr pc, [sp], #4)
+    8050:	3f00b880 	.word	0x3f00b880
+
+00008054 <_main>:
+    8054:	e3a04004 	mov	r4, #4
+    8058:	eb00001f 	bl	80dc <nim>
+    805c:	e3a04007 	mov	r4, #7
+    8060:	eb00001d 	bl	80dc <nim>
+    8064:	e3a04001 	mov	r4, #1
+    8068:	eb00001b 	bl	80dc <nim>
+    806c:	e3a04003 	mov	r4, #3
+    8070:	eb000019 	bl	80dc <nim>
+    8074:	e3a04005 	mov	r4, #5
+    8078:	eb000017 	bl	80dc <nim>
+    807c:	eafffff4 	b	8054 <_main>
+
+00008080 <delay>:
+    8080:	e3a0143f 	mov	r1, #1056964608	; 0x3f000000
+    8084:	e3811a03 	orr	r1, r1, #12288	; 0x3000
+    8088:	e5912004 	ldr	r2, [r1, #4]
+
+0000808c <delay1$>:
+    808c:	e5913004 	ldr	r3, [r1, #4]
+    8090:	e0433002 	sub	r3, r3, r2
+    8094:	e1530000 	cmp	r3, r0
+    8098:	bafffffb 	blt	808c <delay1$>
+    809c:	e1a0f00e 	mov	pc, lr
+
+000080a0 <set_led_state>:
+    80a0:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
+    80a4:	e1a01000 	mov	r1, r0
+    80a8:	e59f0028 	ldr	r0, [pc, #40]	; 80d8 <set_led_state+0x38>
+    80ac:	e3a02000 	mov	r2, #0
+    80b0:	e5802004 	str	r2, [r0, #4]
+    80b4:	e5802010 	str	r2, [r0, #16]
+    80b8:	e3a02082 	mov	r2, #130	; 0x82
+    80bc:	e5802014 	str	r2, [r0, #20]
+    80c0:	e5801018 	str	r1, [r0, #24]
+    80c4:	e2800008 	add	r0, r0, #8
+    80c8:	ebffffce 	bl	8008 <mailbox_write>
+    80cc:	e3a00008 	mov	r0, #8
+    80d0:	ebffffd2 	bl	8020 <mailbox_read>
+    80d4:	e49df004 	pop	{pc}		; (ldr pc, [sp], #4)
+    80d8:	00008120 	.word	0x00008120
+
+000080dc <nim>:
+    80dc:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
+
+000080e0 <loop1$>:
+    80e0:	e3a00001 	mov	r0, #1
+    80e4:	ebffffed 	bl	80a0 <set_led_state>
+    80e8:	e59f0024 	ldr	r0, [pc, #36]	; 8114 <loop1$+0x34>
+    80ec:	ebffffe3 	bl	8080 <delay>
+    80f0:	e3a00000 	mov	r0, #0
+    80f4:	ebffffe9 	bl	80a0 <set_led_state>
+    80f8:	e59f0014 	ldr	r0, [pc, #20]	; 8114 <loop1$+0x34>
+    80fc:	ebffffdf 	bl	8080 <delay>
+    8100:	e2544001 	subs	r4, r4, #1
+    8104:	1afffff5 	bne	80e0 <loop1$>
+    8108:	e59f0008 	ldr	r0, [pc, #8]	; 8118 <loop1$+0x38>
+    810c:	ebffffdb 	bl	8080 <delay>
+    8110:	e49df004 	pop	{pc}		; (ldr pc, [sp], #4)
+    8114:	0003a980 	.word	0x0003a980
+    8118:	00249f00 	.word	0x00249f00
